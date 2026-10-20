@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>双人协作解谜 Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 登录 / 房间界面 -->
+  <div id="lobby" class="panel">
+    <h1>双人协作解谜</h1>
+    <p class="sub">两人同时踩住左右两块压力板打开中门，再各自穿过门，在中央绿色门格会合即通关。</p>
+
+    <input id="nameInput" type="text" maxlength="12" placeholder="你的昵称" />
+
+    <div class="row">
+      <button id="btnCreate">创建房间</button>
+    </div>
+
+    <div class="divider"><span>已有房间码？</span></div>
+
+    <div class="row">
+      <input id="codeInput" type="text" maxlength="4" placeholder="4位房间码" />
+      <button id="btnJoin">加入</button>
+    </div>
+
+    <p id="msg" class="msg"></p>
+    <p id="waitBox" class="wait hidden">房间码：<b id="roomCodeShow"></b><br />等待第二位玩家加入……把房间码发给朋友</p>
+  </div>
+
+  <!-- 游戏界面 -->
+  <div id="game" class="hidden">
+    <div id="hud">
+      <span>房间码：<b id="hudCode"></b></span>
+      <span id="hint">WASD 移动，踩板开门后到中央会合</span>
+    </div>
+    <canvas id="canvas" width="608" height="288"></canvas>
+
+    <!-- 触屏虚拟方向键（手机点按；电脑也可用鼠标点） -->
+    <div id="dpad">
+      <button class="dpad-btn" data-key="up">&#9650;</button>
+      <div class="dpad-row">
+        <button class="dpad-btn" data-key="left">&#9664;</button>
+        <button class="dpad-btn" data-key="down">&#9660;</button>
+        <button class="dpad-btn" data-key="right">&#9654;</button>
+      </div>
+    </div>
+
+    <div id="winBanner" class="hidden">&#127881; 通关！你们成功会合了！</div>
+    <p id="leaveTip" class="hidden partner">队友已离开房间</p>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
