@@ -1,0 +1,100 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #14181f;
+  color: #e8ecf1;
+  font-family: "Microsoft YaHei", system-ui, sans-serif;
+}
+.panel {
+  background: #1f2630;
+  padding: 28px 32px;
+  border-radius: 14px;
+  width: 360px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,.4);
+}
+h1 { margin: 0 0 8px; font-size: 22px; }
+.sub { font-size: 13px; color: #9aa7b4; line-height: 1.6; margin-bottom: 18px; }
+input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border-radius: 8px;
+  border: 1px solid #34404d;
+  background: #141a21;
+  color: #e8ecf1;
+  font-size: 15px;
+}
+.row { display: flex; gap: 8px; margin-top: 8px; }
+.row input { flex: 1; margin: 0; }
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #4da6ff;
+  color: #08131f;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { background: #6fb8ff; }
+.divider { display: flex; align-items: center; gap: 10px; margin: 18px 0 6px; color: #6b7885; font-size: 13px; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #34404d; }
+.msg { color: #ff7a7a; min-height: 18px; font-size: 14px; margin: 10px 0 0; }
+.wait { color: #8be08b; font-size: 15px; line-height: 1.8; }
+.hidden { display: none !important; }
+
+#game { text-align: center; }
+#hud {
+  display: flex;
+  justify-content: space-between;
+  width: 608px;
+  margin: 0 auto 8px;
+  font-size: 14px;
+  color: #c4cfd9;
+}
+#hint { color: #9aa7b4; }
+canvas {
+  background: #0e1218;
+  border-radius: 10px;
+  border: 2px solid #34404d;
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 触屏虚拟方向键 */
+#dpad {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.dpad-row { display: flex; gap: 10px; }
+.dpad-btn {
+  width: 62px;
+  height: 62px;
+  font-size: 24px;
+  border-radius: 16px;
+  background: #2b3542;
+  color: #e8ecf1;
+  border: 1px solid #3c4856;
+  touch-action: none;
+  cursor: pointer;
+}
+.dpad-btn:active { background: #4da6ff; color: #08131f; }
+#winBanner {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #8be08b;
+}
+.partner { color: #ff9a3c; margin-top: 10px; }
