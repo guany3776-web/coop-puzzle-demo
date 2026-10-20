@@ -1,0 +1,15 @@
+{
+  "name": "coop-puzzle-demo",
+  "version": "1.0.0",
+  "description": "两人俯视角协作解谜 最小可玩Demo (HTML Canvas + Node WebSocket)",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
