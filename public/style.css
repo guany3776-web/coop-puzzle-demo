@@ -1,6 +1,6 @@
 * { box-sizing: border-box; }
+html, body { margin: 0; }
 body {
-  margin: 0;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -8,12 +8,14 @@ body {
   background: #14181f;
   color: #e8ecf1;
   font-family: "Microsoft YaHei", system-ui, sans-serif;
+  padding: 12px;
 }
 .panel {
   background: #1f2630;
   padding: 28px 32px;
   border-radius: 14px;
-  width: 360px;
+  width: 380px;
+  max-width: 96vw;
   text-align: center;
   box-shadow: 0 8px 30px rgba(0,0,0,.4);
 }
@@ -48,15 +50,44 @@ button:hover { background: #6fb8ff; }
 .wait { color: #8be08b; font-size: 15px; line-height: 1.8; }
 .hidden { display: none !important; }
 
-#game { text-align: center; }
+/* 选关列表 */
+.level-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 16px; }
+.level-item {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #34404d;
+  background: #141a21;
+  color: #c4cfd9;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+}
+.level-item:hover { background: #1c242e; }
+.level-item.active {
+  border-color: #4da6ff;
+  background: #16283c;
+  color: #e8ecf1;
+}
+.big-btn { width: 100%; padding: 13px; font-size: 17px; border-radius: 10px; }
+.mini-btn {
+  padding: 4px 10px; font-size: 12px; font-weight: 500;
+  background: #2b3542; color: #c4cfd9; border-radius: 6px;
+}
+
+#game { text-align: center; width: 100%; max-width: 640px; }
 #hud {
   display: flex;
   justify-content: space-between;
-  width: 608px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
   margin: 0 auto 8px;
   font-size: 14px;
   color: #c4cfd9;
+  flex-wrap: wrap;
 }
+#levelName { color: #8be08b; }
 #hint { color: #9aa7b4; }
 canvas {
   background: #0e1218;
@@ -64,13 +95,14 @@ canvas {
   border: 2px solid #34404d;
   display: block;
   margin: 0 auto;
-  max-width: 100%;
+  width: 100%;
+  max-width: 608px;
   height: auto;
 }
 
 /* 触屏虚拟方向键 */
 #dpad {
-  margin-top: 16px;
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -91,10 +123,20 @@ canvas {
   cursor: pointer;
 }
 .dpad-btn:active { background: #4da6ff; color: #08131f; }
-#winBanner {
-  margin-top: 12px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #8be08b;
-}
+#winBanner { margin-top: 12px; font-size: 20px; font-weight: 700; color: #8be08b; }
 .partner { color: #ff9a3c; margin-top: 10px; }
+
+/* 竖屏横屏提示遮罩（仅手机竖屏时由 JS 显示） */
+#rotateHint {
+  position: fixed; inset: 0; z-index: 99;
+  background: #14181f;
+  display: flex; align-items: center; justify-content: center;
+}
+.rotate-card { text-align: center; color: #c4cfd9; font-size: 17px; line-height: 1.8; padding: 24px; }
+.rotate-icon { font-size: 56px; margin-bottom: 12px; }
+
+/* 手机横屏小屏时压缩方向键 */
+@media (max-height: 500px) {
+  .dpad-btn { width: 52px; height: 52px; }
+  #dpad { margin-top: 8px; gap: 6px; }
+}
