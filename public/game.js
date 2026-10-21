@@ -109,10 +109,10 @@ ws.onmessage = (e) => {
     leaveTip.classList.add('hidden');
   } else if (m.t === 'state') {
     lastState = m;
-    if (m.won) {
-      winBanner.classList.remove('hidden');
-      if (amHost) btnNext.classList.remove('hidden');
-    }
+    if (m.won) winBanner.classList.remove('hidden'); // 自动续关，无需点按钮
+  } else if (m.t === 'finished') {
+    winBanner.textContent = '🏆 恭喜通关第一章「热身训练」！';
+    winBanner.classList.remove('hidden');
   } else if (m.t === 'error') {
     msg.textContent = m.msg;
     readyNote.textContent = m.msg;
