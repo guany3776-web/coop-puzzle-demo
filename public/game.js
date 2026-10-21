@@ -15,6 +15,7 @@ const readyNote = document.getElementById('readyNote');
 const hudCode = document.getElementById('hudCode');
 const levelNameEl = document.getElementById('levelName');
 const winBanner = document.getElementById('winBanner');
+const btnNext = document.getElementById('btnNext');
 const leaveTip = document.getElementById('leaveTip');
 const bgmBtn = document.getElementById('bgmBtn');
 const rotateHint = document.getElementById('rotateHint');
@@ -104,10 +105,14 @@ ws.onmessage = (e) => {
     roomLobby.classList.add('hidden');
     gameEl.classList.remove('hidden');
     winBanner.classList.add('hidden');
+    btnNext.classList.add('hidden');
     leaveTip.classList.add('hidden');
   } else if (m.t === 'state') {
     lastState = m;
-    if (m.won) winBanner.classList.remove('hidden');
+    if (m.won) {
+      winBanner.classList.remove('hidden');
+      if (amHost) btnNext.classList.remove('hidden');
+    }
   } else if (m.t === 'error') {
     msg.textContent = m.msg;
     readyNote.textContent = m.msg;
@@ -117,6 +122,7 @@ ws.onmessage = (e) => {
 };
 
 btnStart.addEventListener('click', () => send({ t: 'start_game' }));
+btnNext.addEventListener('click', () => send({ t: 'next_level' }));
 
 // ---------- 键盘输入 ----------
 const KEYMAP = {
