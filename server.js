@@ -11,78 +11,72 @@ const MOVE_SPEED = 3.12;     // 原 2.4 ×1.3
 const TICK_MS = 100;
 const PLAYER_R = 11;
 
-// ---------- 关卡定义（权威在服务器；#墙 .地板 D=门/汇合点） ----------
-// 每关：map(19列×9行)、plateA/plateB 两块压板、goal 门格、spawn 两个出生点
+// ---------- 关卡定义（权威在服务器） ----------
+// map: 19列×9行。#墙 .地板 D=门(过关通道) G=汇合绿格 P/Q=压板(仅图示，以plates为准)
+// doorMode:
+//   'hold'     两块压板同时踩下 → 永久开门（教学）
+//   'timed'    任一人踩压板 → 门开；两块板都没人踩后 8 秒自动关门（接力冲刺）
+//   'sequence' 必须按 plates 顺序逐块踩对 → 永久开门（顺序密码）
+// plates: 压板坐标数组；goal: 汇合格；spawn: 两人生成点
+const CHAPTER = '第一章 · 热身训练';
 const LEVELS = [
   {
-    name: '第1关 · 并肩开门',
+    chapter: CHAPTER,
+    name: '并肩开门',
+    doorMode: 'hold',
     map: [
       '###################',
       '#........#........#',
       '#........#........#',
-      '#P.......D.......Q#',
+      '#........D........#',
       '#........#........#',
       '#........#........#',
       '#........#........#',
       '#........#........#',
       '###################',
     ],
-    plateA: { c: 1, r: 3 },
-    plateB: { c: 17, r: 3 },
+    plates: [{ c: 1, r: 3 }, { c: 17, r: 3 }],
     goal: { c: 9, r: 3 },
     spawn: [{ c: 1, r: 7 }, { c: 17, r: 7 }],
   },
   {
-    name: '第2关 · 对角呼应',
+    chapter: CHAPTER,
+    name: '限时接力',
+    doorMode: 'timed',
+    doorTimerMs: 8000,
     map: [
       '###################',
-      '#.................#',
-      '#.................#',
-      '#.................#',
-      '#.................#',
-      '#.................#',
-      '#.................#',
-      '#.................#',
+      '#........#........#',
+      '#........#........#',
+      '#........#........#',
+      '#........D........#',
+      '#........#........#',
+      '#........#........#',
+      '#........#........#',
       '###################',
     ],
-    plateA: { c: 1, r: 1 },
-    plateB: { c: 17, r: 7 },
-    goal: { c: 9, r: 4 },
-    spawn: [{ c: 1, r: 7 }, { c: 17, r: 1 }],
+    plates: [{ c: 1, r: 4 }, { c: 17, r: 4 }],
+    goal: { c: 17, r: 1 },
+    spawn: [{ c: 1, r: 7 }, { c: 1, r: 1 }],
   },
   {
-    name: '第3关 · 绕柱会合',
+    chapter: CHAPTER,
+    name: '顺序密码',
+    doorMode: 'sequence',
     map: [
       '###################',
       '#........#........#',
       '#........#........#',
-      '#.................#',
-      '#.................#',
+      '#........D........#',
+      '#........#........#',
+      '#........#........#',
       '#........#........#',
       '#........#........#',
       '###################',
     ],
-    plateA: { c: 1, r: 4 },
-    plateB: { c: 17, r: 4 },
-    goal: { c: 9, r: 4 },
-    spawn: [{ c: 1, r: 7 }, { c: 17, r: 7 }],
-  },
-  {
-    name: '第4关 · 上下两层',
-    map: [
-      '###################',
-      '#.................#',
-      '#.................#',
-      '#.................#',
-      '####...##.##...####',
-      '#.................#',
-      '#.................#',
-      '#.................#',
-      '###################',
-    ],
-    plateA: { c: 1, r: 1 },
-    plateB: { c: 17, r: 1 },
-    goal: { c: 9, r: 7 },
+    // 顺序：先左 → 再右 → 最后中间
+    plates: [{ c: 1, r: 4 }, { c: 17, r: 4 }, { c: 9, r: 7 }],
+    goal: { c: 9, r: 1 },
     spawn: [{ c: 1, r: 7 }, { c: 17, r: 7 }],
   },
 ];
@@ -131,6 +125,13 @@ function cellAt(px, py) {
   return { c: Math.floor(px / TILE), r: Math.floor(py / TILE) };
 }
 
+function plateIndexAt(cell, level) {
+  for (let i = 0; i < level.plates.length; i++) {
+    if (level.plates[i].c === cell.c && level.plates[i].r === cell.r) return i;
+  }
+  return -1;
+}
+
 function isSolid(map, c, r, doorOpen) {
   if (r < 0 || r >= map.length || c < 0 || c >= map[r].length) return true;
   const ch = map[r][c];
@@ -175,8 +176,13 @@ function send(ws, obj) {
 
 function publicLevel(lv) {
   return {
-    name: lv.name, map: lv.map,
-    plateA: lv.plateA, plateB: lv.plateB, goal: lv.goal, spawn: lv.spawn,
+    chapter: lv.chapter,
+    name: lv.name,
+    map: lv.map,
+    doorMode: lv.doorMode,
+    plates: lv.plates,
+    goal: lv.goal,
+    spawn: lv.spawn,
   };
 }
 
@@ -211,11 +217,33 @@ function startRoomLoop(room) {
 
     const p0 = room.players[0];
     const p1 = room.players[1];
-    const a = cellAt(p0.x, p0.y);
-    const b = cellAt(p1.x, p1.y);
-    p0.onPlate = (a.c === level.plateA.c && a.r === level.plateA.r);
-    p1.onPlate = (b.c === level.plateB.c && b.r === level.plateB.r);
-    if (p0.onPlate && p1.onPlate) room.doorOpen = true; // 双踩开门，锁存
+    const idxs = [cellAt(p0.x, p0.y), cellAt(p1.x, p1.y)].map(c => plateIndexAt(c, level));
+    p0.onPlate = idxs[0] >= 0;
+    p1.onPlate = idxs[1] >= 0;
+    const anyoneOn = idxs.some(i => i >= 0);
+
+    if (level.doorMode === 'hold') {
+      if (idxs[0] === 0 && idxs[1] === 1) room.doorOpen = true;
+    } else if (level.doorMode === 'timed') {
+      if (anyoneOn) {
+        room.doorOpen = true;
+        room.doorTimer = level.doorTimerMs || 8000;
+      } else if (room.doorOpen) {
+        room.doorTimer -= TICK_MS;
+        if (room.doorTimer <= 0) room.doorOpen = false;
+      }
+    } else if (level.doorMode === 'sequence') {
+      [0, 1].forEach((pi) => {
+        const cur = idxs[pi];
+        const prev = room.prevPlate[pi];
+        if (cur >= 0 && cur !== prev) {
+          if (cur === room.seqProgress) room.seqProgress += 1;
+          else room.seqProgress = 0;
+        }
+        room.prevPlate[pi] = cur;
+      });
+      if (room.seqProgress >= level.plates.length) room.doorOpen = true;
+    }
 
     if (room.doorOpen) {
       const g0 = cellAt(p0.x, p0.y);
@@ -305,6 +333,9 @@ wss.on('connection', (ws) => {
       room.started = true;
       room.doorOpen = false;
       room.won = false;
+      room.doorTimer = level.doorTimerMs || 8000;
+      room.seqProgress = 0;
+      room.prevPlate = [-1, -1];
       room.players = room.players.map((p, i) => {
         const np = makePlayer(i, level);
         np.name = p.name;
@@ -330,6 +361,9 @@ wss.on('connection', (ws) => {
       const level = LEVELS[next];
       room.doorOpen = false;
       room.won = false;
+      room.doorTimer = level.doorTimerMs || 8000;
+      room.seqProgress = 0;
+      room.prevPlate = [-1, -1];
       room.players = room.players.map((p, i) => {
         const np = makePlayer(i, level);
         np.name = p.name;
