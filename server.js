@@ -251,11 +251,42 @@ function startRoomLoop(room) {
       if (g0.c === level.goal.c && g0.r === level.goal.r &&
           g1.c === level.goal.c && g1.r === level.goal.r) {
         room.won = true;
+        if (!room.autoScheduled) {
+          room.autoScheduled = true;
+          setTimeout(() => advanceRoom(room), 2500);
+        }
       }
     }
 
     broadcast(room);
   }, TICK_MS);
+}
+
+// 通关后自动进入下一段；最后一段则宣布整章完成
+function advanceRoom(room) {
+  room.autoScheduled = false;
+  const isLast = room.levelId >= LEVELS.length - 1;
+  if (isLast) {
+    room.clients.forEach(c => send(c, { t: 'finished', chapter: CHAPTER }));
+    return;
+  }
+  const next = room.levelId + 1;
+  room.levelId = next;
+  const level = LEVELS[next];
+  room.doorOpen = false;
+  room.won = false;
+  room.doorTimer = level.doorTimerMs || 8000;
+  room.seqProgress = 0;
+  room.prevPlate = [-1, -1];
+  room.players = room.players.map((p, i) => {
+    const np = makePlayer(i, level);
+    np.name = p.name;
+    return np;
+  });
+  room.clients.forEach((c, i) => send(c, {
+    t: 'start', you: i, code: room.code,
+    levelId: next, level: publicLevel(level),
+  }));
 }
 
 wss.on('connection', (ws) => {
