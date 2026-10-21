@@ -2,15 +2,23 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>双人协作解谜 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>双人协作解谜</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- 登录 / 房间界面 -->
+  <!-- 竖屏提示（手机请横屏） -->
+  <div id="rotateHint" class="hidden">
+    <div class="rotate-card">
+      <div class="rotate-icon">📱🔄</div>
+      <p>请把手机<b>横过来</b>玩，画面更宽敞</p>
+    </div>
+  </div>
+
+  <!-- 登录 / 创建加入界面 -->
   <div id="lobby" class="panel">
     <h1>双人协作解谜</h1>
-    <p class="sub">两人同时踩住左右两块压力板打开中门，再各自穿过门，在中央绿色门格会合即通关。</p>
+    <p class="sub">两人同时踩住两块压力板打开中门，穿过门在绿色门格会合即通关。共 4 关。</p>
 
     <input id="nameInput" type="text" maxlength="12" placeholder="你的昵称" />
 
@@ -26,28 +34,41 @@
     </div>
 
     <p id="msg" class="msg"></p>
-    <p id="waitBox" class="wait hidden">房间码：<b id="roomCodeShow"></b><br />等待第二位玩家加入……把房间码发给朋友</p>
+  </div>
+
+  <!-- 房间等待 / 选关界面 -->
+  <div id="roomLobby" class="panel hidden">
+    <h1>房间 <b id="roomCodeShow"></b></h1>
+    <p id="hostNote" class="sub">你来选一关，选好后点「开始游戏」</p>
+    <p id="joinWait" class="wait hidden">等待房主选择关卡并开始……</p>
+
+    <div id="levelList" class="level-list"></div>
+
+    <button id="btnStart" class="big-btn hidden">开始游戏</button>
+    <p id="readyNote" class="partner hidden">队友已就位，可以开始</p>
   </div>
 
   <!-- 游戏界面 -->
   <div id="game" class="hidden">
     <div id="hud">
       <span>房间码：<b id="hudCode"></b></span>
-      <span id="hint">WASD 移动，踩板开门后到中央会合</span>
+      <span id="levelName"></span>
+      <span id="hint">WASD 移动</span>
+      <button id="bgmBtn" class="mini-btn">🔊 配乐开</button>
     </div>
     <canvas id="canvas" width="608" height="288"></canvas>
 
     <!-- 触屏虚拟方向键（手机点按；电脑也可用鼠标点） -->
     <div id="dpad">
-      <button class="dpad-btn" data-key="up">&#9650;</button>
+      <button class="dpad-btn" data-key="up">▲</button>
       <div class="dpad-row">
-        <button class="dpad-btn" data-key="left">&#9664;</button>
-        <button class="dpad-btn" data-key="down">&#9660;</button>
-        <button class="dpad-btn" data-key="right">&#9654;</button>
+        <button class="dpad-btn" data-key="left">◀</button>
+        <button class="dpad-btn" data-key="down">▼</button>
+        <button class="dpad-btn" data-key="right">▶</button>
       </div>
     </div>
 
-    <div id="winBanner" class="hidden">&#127881; 通关！你们成功会合了！</div>
+    <div id="winBanner" class="hidden">🎉 通关！你们成功会合了！</div>
     <p id="leaveTip" class="hidden partner">队友已离开房间</p>
   </div>
 
