@@ -321,6 +321,25 @@ wss.on('connection', (ws) => {
       const p = room.players[ws.myIdx];
       if (p && p.keys.hasOwnProperty(msg.key)) p.keys[msg.key] = !!msg.down;
     }
+
+    // 房主通关后进入下一关（循环）
+    else if (msg.t === 'next_level' && room && room.won) {
+      if (ws.myIdx !== 0) return;
+      const next = (room.levelId + 1) % LEVELS.length;
+      room.levelId = next;
+      const level = LEVELS[next];
+      room.doorOpen = false;
+      room.won = false;
+      room.players = room.players.map((p, i) => {
+        const np = makePlayer(i, level);
+        np.name = p.name;
+        return np;
+      });
+      room.clients.forEach((c, i) => send(c, {
+        t: 'start', you: i, code: room.code,
+        levelId: next, level: publicLevel(level),
+      }));
+    }
   });
 
   ws.on('close', () => {
