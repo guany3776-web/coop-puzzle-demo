@@ -101,7 +101,7 @@ ws.onmessage = (e) => {
     myIdx = m.you;
     currentLevel = m.level;
     hudCode.textContent = m.code;
-    levelNameEl.textContent = m.level ? m.level.name : '';
+    levelNameEl.textContent = m.level ? ((m.level.chapter || '') + ' · ' + m.level.name) : '';
     roomLobby.classList.add('hidden');
     gameEl.classList.remove('hidden');
     winBanner.classList.add('hidden');
@@ -232,7 +232,7 @@ function draw() {
   }
 
   // 压板（用服务器下发坐标）
-  for (const plate of [currentLevel.plateA, currentLevel.plateB]) {
+  for (const plate of currentLevel.plates) {
     ctx.fillStyle = '#c9a227';
     ctx.fillRect(plate.c * TILE + 6, plate.r * TILE + 6, TILE - 12, TILE - 12);
   }
